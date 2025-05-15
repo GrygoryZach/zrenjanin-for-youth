@@ -56,7 +56,16 @@ document.addEventListener("DOMContentLoaded", function() {
             "longitude": 20.38999,
             "image_url": "https://105.rs/wp-content/uploads/2023/05/kulturni-centar-zr.png",
             "short_description": "Savremeni prostor za kulturna dešavanja u srcu grada, sa bogatim programom koncerata, izložbi i predstava."
-        }
+        },
+                {
+            "id": 4,
+            "name": "Stadion Gradnulica",
+            "category": "sport",
+            "latitude": 45.39695,
+            "longitude": 20.39476,
+            "image_url": "https://media.ilovezrenjanin.com/2024/10/fk-vojvodina-basaid.jpg",
+            "short_description": "Stadion na Gradnulici. Veliki fudbalski i košarkaški tereni."
+        },
     ]
 
     displayPlaces(places);
@@ -75,7 +84,12 @@ function closeMapModal(mapModal) {
 }
 
 function initializeMap(mapContainer, places) {
-    const map = L.map(mapContainer).setView([45.38036, 20.39056], 15); // Centered on Zrenjanin city center
+    const map = L.map(mapContainer, {
+        center: [45.38036, 20.39056], // Zrenjanin city center
+        zoom: 15,
+        zoomSnap: 0.25,
+        zoomDelta: 1
+    });
 
     // Basic map layers
     L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
@@ -101,7 +115,7 @@ function initializeMap(mapContainer, places) {
 
     // Adjust zoom level to be a bit smaller (zoom out by 1 level)
     const currentZoom = map.getZoom(); // Get the current zoom level after fitBounds
-    map.setZoom(currentZoom - 1); // Zoom out by 1 level (adjust this value as needed)
+    map.setZoom(currentZoom - 0.25); // Zoom out by 1 level (adjust this value as needed)
 }
 
 function searchFunction(searchInput, places) {
