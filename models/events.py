@@ -13,5 +13,16 @@ class Event(SqlAlchemyBase):
     place_id = Column(Integer, ForeignKey('places.id'), nullable=False)
     category_id = Column(Integer, ForeignKey('event_categories.id'), nullable=False)
 
-    place = relationship("Place", back_populates="events")
-    category = relationship("EventCategory", back_populates="events")
+    place = relationship("Place")
+    category = relationship("EventCategory")
+
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'name': self.name,
+            'description': self.description,
+            'datetime': self.datetime,
+            'place_id': self.place_id,
+            'category_id': self.category_id
+        }
+
