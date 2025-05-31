@@ -23,6 +23,10 @@ class Event(SqlAlchemyBase):
             'description': self.description,
             'datetime': self.datetime,
             'place_id': self.place_id,
-            'category_id': self.category_id
+            'category': {
+                'category_id': self.category_id,
+                'category_name': self.category.name,
+                'category_parent_id': self.category.parent_id
+            }
         }
 
