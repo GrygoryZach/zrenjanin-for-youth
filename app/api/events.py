@@ -7,7 +7,7 @@ from db.db_session import create_session
 from models.__all_models import Event, EventCategory, Place  # Place is imported for the /events/<id>/place route
 
 # Create a Blueprint specifically for Event-related APIs
-events_api_bp = Blueprint('events_api', __name__, url_prefix='api')
+events_api_bp = Blueprint('events_api', __name__, url_prefix='/api')
 
 
 # GET a specific Event by ID

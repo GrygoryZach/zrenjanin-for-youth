@@ -12,7 +12,8 @@ def create_app():
 
     app.config.from_object('app.config.Config')
 
-    from . import routes
+    from . import routes, api
     app.register_blueprint(routes.bp)
-
+    app.register_blueprint(api.places_api_bp)
+    app.register_blueprint(api.events_api_bp)
     return app
