@@ -21,5 +21,9 @@ class Place(SqlAlchemyBase):
             'name': self.name,
             'description': self.description,
             'position': self.position,
-            'category_id': self.category_id
+            'category': {
+                'category_id': self.category_id,
+                'category_name': self.category.name,
+                'category_parent_id': self.category.parent_id
+            }
         }
