@@ -1,6 +1,6 @@
 from flask import Blueprint, render_template
 
-bp = Blueprint('places', __name__)
+bp = Blueprint('routes', __name__)
 
 
 @bp.route('/')
