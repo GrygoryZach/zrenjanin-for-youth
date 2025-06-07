@@ -30,7 +30,7 @@ def find_places():
     Query string parameters:
         page (int, optional): The page number to retrieve. Default is 1.
         per_page (int, optional): The number of items per page. Default is 10.
-        search (str, optional): A keyword to search for in place names or short descriptions.
+        search (str, optional): A keyword to search for in place names or descriptions.
         categories (str, optional): A comma-separated string of categories names to filter by.
 
     Returns:
@@ -55,7 +55,7 @@ def find_places():
             # Join with PlaceCategory table and filter by category name
             query = query.join(Place.category).filter(PlaceCategory.name.in_(categories_list))
 
-        # Apply search filtering by name or short_description
+        # Apply search filtering by name or description
         search_query = request.args.get('search')
         if search_query:
             search_pattern = f"%{search_query.lower()}%"
@@ -63,7 +63,7 @@ def find_places():
             query = query.filter(
                 or_(
                     Place.name.ilike(search_pattern),
-                    Place.short_description.ilike(search_pattern)
+                    Place.description.ilike(search_pattern)
                 )
             )
 
