@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Zanimljiva mesta - Zrenjnain</title>
+    <link rel="stylesheet" href="../static/css/style.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" defer></script>
+    <script src="../static/js/places.js" defer></script>
+</head>
+<body>
+<div class="container">
+    <header class="top-bar">
+        <input type="text" id="search-input" placeholder="Pretraga po nazivu/opisu...">
+        <button id="search-button">Pronađi</button>
+        <button id="toggle-map">Prikaži mapu</button>
+    </header>
+
+    <div class="main-content">
+        <aside class="filters">
+            <h3>Kategorije</h3>
+            <label><input type="checkbox" name="category" value="entertainment"> Zabava</label><br>
+            <label><input type="checkbox" name="category" value="culture"> Kultura</label><br>
+            <label><input type="checkbox" name="category" value="nauka"> Nauka</label><br>
+            <h3>Dodatni filteri</h3>
+            <label for="categoriesFilter">Filteri po kategorijama:</label>
+            <select id="categoriesFilter" multiple size="3">
+                <option value="Park">Park</option>
+                <option value="Restaurant">Restoran</option>
+                <option value="Cafe">Kafe</option>
+                <option value="Bar">Bar</option>
+            </select><br>
+            <small>Držite Ctrl/Cmd da biste odabrali nekoliko.</small>
+            <br><br>
+            <label for="perPageSelect">Razultata po stranici:</label>
+            <select id="perPageSelect">
+                <option value="5">5</option>
+                <option value="10" selected>10</option>
+                <option value="20">20</option>
+            </select>
+            <br><br>
+        </aside>
+
+        <section class="places-grid-container"><h2>Rezultati pretrage</h2>
+            <p id="loading-message">Učitavanje rezultata...</p>
+            <p id="error-message">Došlo je do greške prilikom učitavanja.</p>
+            <div id="placesResults">
+                <p>Krenite da pretražujete da biste videli rezultate.</p>
+            </div>
+            <footer class="pagination">
+                <button id="prevPageButton" disabled>Prošla</button>
+                <span id="currentPageInfo">Stranica 1 od 1</span>
+                <button id="nextPageButton" disabled>Sledeća</button>
+            </footer>
+        </section>
+    </div>
+</div>
+
+<div id="map-modal" class="map-modal hidden">
+    <div class="map-modal-content">
+        <button class="close-map">&times;</button>
+        <div id="map"></div>
+    </div>
+</div>
+</body>
+</html>
