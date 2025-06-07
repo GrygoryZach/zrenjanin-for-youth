@@ -1,4 +1,14 @@
-// --- Asynchronous JavaScript function to make an API request ---
+const searchInput = document.getElementById('search-input');
+const filterCheckboxes = document.querySelectorAll(".filters input[type='checkbox']");
+const placesResultsDiv = document.querySelector('.places-grid-container');
+const loadingMessage = document.getElementById('loading-message');
+const errorMessage = document.getElementById('error-message');
+const searchButton = document.getElementById('search-button'); // New element: search button
+
+let currentPage = 1;
+let totalPages = 1;
+
+
 async function getPlaces(options = {}) {
     const { page = 1, per_page = 10, search = '', categories = [] } = options;
 
@@ -6,15 +16,9 @@ async function getPlaces(options = {}) {
     params.append('page', page);
     params.append('per_page', per_page);
 
-    if (search) {
-        params.append('search', search);
-    }
-
-    if (categories.length > 0) {
-        params.append('categories', categories.join(','));
-    }
-
-    const url = `/api/places?${params.toString()}`; // Use relative path
+    if (search) params.append('search', search);
+    if (categories.length > 0) params.append('categories', categories.join(','));
+    const url = `/api/places?${params.toString()}`;
 
     try {
         const response = await fetch(url, {
@@ -26,29 +30,20 @@ async function getPlaces(options = {}) {
 
         if (!response.ok) {
             const errorData = await response.json();
-            throw new Error(`HTTP error! Status: ${response.status}, Message: ${errorData.message || 'Unknown error'}`);
+            throw new Error(
+                `HTTP error! Status: ${response.status}, Message: ${errorData.message || 'Unknown error'}`
+            );
         }
 
         const data = await response.json();
         return data;
     } catch (error) {
-        console.error("Error fetching places:", error);
+        console.error('Error fetching places:', error);
         throw error;
     }
 }
 
-// --- DOM Elements ---
-const searchInput = document.getElementById('search-input');
-const filterCheckboxes = document.querySelectorAll(".filters input[type='checkbox']");
-const placesResultsDiv = document.querySelector(".places-grid-container");
-const loadingMessage = document.getElementById('loading-message');
-const errorMessage = document.getElementById('error-message');
-const searchButton = document.getElementById('search-button'); // New element: search button
 
-let currentPage = 1;
-let totalPages = 1;
-
-// --- Function to perform search and display results ---
 async function performSearch() {
     if (loadingMessage) loadingMessage.style.display = 'block';
     if (errorMessage) errorMessage.style.display = 'none';
@@ -81,22 +76,23 @@ async function performSearch() {
 
         currentPage = page;
         totalPages = total_pages;
-
     } catch (error) {
         if (loadingMessage) loadingMessage.style.display = 'none';
         if (errorMessage) errorMessage.style.display = 'block';
+
         placesResultsDiv.innerHTML = '<p>Failed to load places. Please try again.</p>';
-        console.error("Error in performSearch:", error);
+        console.error('Error in performSearch:', error);
     }
 }
 
-// --- Function to display places on the page ---
+
 function displayPlaces(filteredPlaces) {
-    placesResultsDiv.innerHTML = "";
+    placesResultsDiv.innerHTML = '';
 
     filteredPlaces.forEach(place => {
-        const placeCard = document.createElement("div");
-        placeCard.classList.add("place-card");
+        const placeCard = document.createElement('div');
+        placeCard.classList.add('place-card');
+
         placeCard.innerHTML = `
             <img src="${place.image_url || '/static/img/placeholder.jpg'}" alt="${place.name}">
             <h4>${place.name}</h4>
@@ -108,10 +104,9 @@ function displayPlaces(filteredPlaces) {
     });
 }
 
-// --- Event Listeners ---
 
 // Request is sent only when the search button is clicked
-searchButton.addEventListener("click", () => {
+searchButton.addEventListener('click', () => {
     currentPage = 1; // Always reset to the first page for a new search/filter
     performSearch();
 });
