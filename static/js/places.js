@@ -1,148 +1,98 @@
-// Waiting for the DOM to load
-document.addEventListener("DOMContentLoaded", function() {
-    const openMapButton = document.getElementById("toggle-map");
-    const mapModal = document.getElementById("map-modal");
-    const closeMapButton = document.querySelector(".close-map");
-    const mapContainer = document.getElementById("map");
-    const searchInput = document.getElementById("search-input");
-    const filterCheckboxes = document.querySelectorAll(".filters input[type='checkbox']");
+// --- Asynchronous JavaScript function to make an API request ---
+async function getPlaces(options = {}) {
+    const { page = 1, per_page = 10, search = '', categories = [] } = options;
 
-    let places = []; // PLaces data (should be uploaded from server)
+    const params = new URLSearchParams();
+    params.append('page', page);
+    params.append('per_page', per_page);
 
-    openMapButton.addEventListener("click", () => {
-        openMap(mapModal, mapContainer, places)
-    });
-    closeMapButton.addEventListener("click", () => {
-        closeMapModal(mapModal, mapContainer)
-    });
+    if (search) {
+        params.append('search', search);
+    }
 
-    // Handle input in the search field
-    searchInput.addEventListener("input", (event) => {
-        searchFunction(event.target, places);
-    });
+    if (categories.length > 0) {
+        params.append('categories', categories.join(','));
+    }
 
+    const url = `/api/places?${params.toString()}`; // Use relative path
 
-    // Listen to changes in the filters
-    filterCheckboxes.forEach(checkbox => {
-        checkbox.addEventListener("change", () => {
-            filterPlacesByCategory(places, filterCheckboxes);
+    try {
+        const response = await fetch(url, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+            },
         });
-    });
 
-    places = [
-        {
-            "id": 1,
-            "name": "Vinyl Bassic",
-            "category": "entertainment",
-            "latitude": 45.37995,
-            "longitude": 20.39280,
-            "image_url": "https://media.ilovezrenjanin.com/2024/05/vinyl-bassic-2-e1716305224556.jpg",
-            "short_description": "Popularno mesto u centru grada sa muzičkim događajima i opuštenom atmosferom."
-        },
-        {
-            "id": 2,
-            "name": "Caffe Bridge",
-            "category": "entertainment",
-            "latitude": 45.37934,
-            "longitude": 20.38927,
-            "image_url": "https://scontent.fbeg7-2.fna.fbcdn.net/v/t39.30808-6/471450851_1144297101034417_3375446139899935729_n.jpg?_nc_cat=108&ccb=1-7&_nc_sid=833d8c&_nc_ohc=cqp7u19PUJkQ7kNvwFP4bxO&_nc_oc=AdmHaLa4vSYKPxpGesmmiXni7droYJuJYl4LsIkABoqvKOUB1-ae-O7I2KPc_gLDxNY&_nc_zt=23&_nc_ht=scontent.fbeg7-2.fna&_nc_gid=x9yGxgEB7FE_WkgSNTSXZw&oh=00_AfKAUpelC3FGSpVoqHQX-Bp8X8_86XE0xNPm_pf4m4y26A&oe=68290B22",
-            "short_description": "Kafić sa prelepim pogledom na reku, idealan za opuštanje uz koktel ili kafu."
-        },
-        {
-            "id": 4,
-            "name": "Kulturni centar Zrenjanin",
-            "category": "culture",
-            "latitude": 45.37826,
-            "longitude": 20.38999,
-            "image_url": "https://105.rs/wp-content/uploads/2023/05/kulturni-centar-zr.png",
-            "short_description": "Savremeni prostor za kulturna dešavanja u srcu grada, sa bogatim programom koncerata, izložbi i predstava."
-        },
-                {
-            "id": 4,
-            "name": "Stadion Gradnulica",
-            "category": "sport",
-            "latitude": 45.39695,
-            "longitude": 20.39476,
-            "image_url": "https://media.ilovezrenjanin.com/2024/10/fk-vojvodina-basaid.jpg",
-            "short_description": "Stadion na Gradnulici. Veliki fudbalski i košarkaški tereni."
-        },
-    ]
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(`HTTP error! Status: ${response.status}, Message: ${errorData.message || 'Unknown error'}`);
+        }
 
-    displayPlaces(places);
-});
-
-function openMap(mapModal, mapContainer, places) {
-    mapModal.classList.remove("hidden");
-    if (!mapModal.dataset.initialized) {
-        initializeMap(mapContainer, places);
-        mapModal.dataset.initialized = "true";
+        const data = await response.json();
+        return data;
+    } catch (error) {
+        console.error("Error fetching places:", error);
+        throw error;
     }
 }
 
-function closeMapModal(mapModal) {
-    mapModal.classList.add("hidden");
-}
+// --- DOM Elements ---
+const searchInput = document.getElementById('search-input');
+const filterCheckboxes = document.querySelectorAll(".filters input[type='checkbox']");
+const placesResultsDiv = document.querySelector(".places-grid-container");
+const loadingMessage = document.getElementById('loading-message');
+const errorMessage = document.getElementById('error-message');
+const searchButton = document.getElementById('search-button'); // New element: search button
 
-function initializeMap(mapContainer, places) {
-    const map = L.map(mapContainer, {
-        center: [45.38036, 20.39056], // Zrenjanin city center
-        zoom: 15,
-        zoomSnap: 0.25,
-        zoomDelta: 1
-    });
+let currentPage = 1;
+let totalPages = 1;
 
-    // Basic map layers
-    L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
-        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-    }).addTo(map);
+// --- Function to perform search and display results ---
+async function performSearch() {
+    if (loadingMessage) loadingMessage.style.display = 'block';
+    if (errorMessage) errorMessage.style.display = 'none';
+    placesResultsDiv.innerHTML = '';
 
-    const bounds = new L.LatLngBounds(); // Create a bounds object to contain all markers
-
-    // Add markers for each place
-    places.forEach(place => {
-        const marker = L.marker([place.latitude, place.longitude]).addTo(map);
-        marker.bindPopup(`
-            <strong>${place.name}</strong><br>
-            <p>${place.short_description}</p>
-            <a href="/places/${place.id}">Više</a>
-        `);
-
-        bounds.extend([place.latitude, place.longitude]); // Extend the bounds to include each marker's position
-    });
-
-    // Fit map bounds to include all places
-    map.fitBounds(bounds);
-
-    // Adjust zoom level to be a bit smaller (zoom out by 1 level)
-    const currentZoom = map.getZoom(); // Get the current zoom level after fitBounds
-    map.setZoom(currentZoom - 0.25); // Zoom out by 1 level (adjust this value as needed)
-}
-
-function searchFunction(searchInput, places) {
-    const query = searchInput.value.toLowerCase();
-    const filteredPlaces = places.filter(place =>
-    place.name.toLowerCase().includes(query) ||
-    place.short_description.toLowerCase().includes(query)
-    );
-    displayPlaces(filteredPlaces);
-}
-
-function filterPlacesByCategory(places, filterCheckboxes) {
+    const searchTerm = searchInput.value;
     const selectedCategories = Array.from(filterCheckboxes)
         .filter(checkbox => checkbox.checked)
         .map(checkbox => checkbox.value);
 
-    const filteredPlaces = places.filter(place => {
-        if (selectedCategories.length === 0) return true; // If no filters used, show all places
-        return selectedCategories.includes(place.category);
-    });
+    const itemsPerPage = 10;
 
-    displayPlaces(filteredPlaces);
+    try {
+        const result = await getPlaces({
+            page: currentPage,
+            per_page: itemsPerPage,
+            search: searchTerm,
+            categories: selectedCategories
+        });
+
+        if (loadingMessage) loadingMessage.style.display = 'none';
+
+        const { places, total_places, page, per_page, total_pages } = result;
+
+        if (places.length === 0) {
+            placesResultsDiv.innerHTML = '<p>No places found for your query.</p>';
+        } else {
+            displayPlaces(places);
+        }
+
+        currentPage = page;
+        totalPages = total_pages;
+
+    } catch (error) {
+        if (loadingMessage) loadingMessage.style.display = 'none';
+        if (errorMessage) errorMessage.style.display = 'block';
+        placesResultsDiv.innerHTML = '<p>Failed to load places. Please try again.</p>';
+        console.error("Error in performSearch:", error);
+    }
 }
 
+// --- Function to display places on the page ---
 function displayPlaces(filteredPlaces) {
-    const placesContainer = document.querySelector(".places-grid");
-    placesContainer.innerHTML = ""; // Clear the container
+    placesResultsDiv.innerHTML = "";
 
     filteredPlaces.forEach(place => {
         const placeCard = document.createElement("div");
@@ -150,10 +100,21 @@ function displayPlaces(filteredPlaces) {
         placeCard.innerHTML = `
             <img src="${place.image_url || '/static/img/placeholder.jpg'}" alt="${place.name}">
             <h4>${place.name}</h4>
-            <p class="category">${place.category}</p>
-            <p class="short-desc">${place.short_description}</p>
+            <p class="category">${place.category ? place.category.name : 'Not specified'}</p>
+            <p class="short-desc">${place.short_description || place.description || 'No description available'}</p>
             <a href="/places/${place.id}" class="more-btn">Više</a>
         `;
-        placesContainer.appendChild(placeCard);
+        placesResultsDiv.appendChild(placeCard);
     });
 }
+
+// --- Event Listeners ---
+
+// Request is sent only when the search button is clicked
+searchButton.addEventListener("click", () => {
+    currentPage = 1; // Always reset to the first page for a new search/filter
+    performSearch();
+});
+
+// Load data on initial page load (without needing to press the button)
+document.addEventListener('DOMContentLoaded', performSearch);
