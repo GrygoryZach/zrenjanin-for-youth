@@ -133,3 +133,9 @@ document.addEventListener("DOMContentLoaded", function() {
 
     displayPlaces(places);
 });
+
+
+const currentUrl = window.location.href; 
+// Example: "http://localhost:5000/page?name=John"
+
+console.log(currentUrl);
