@@ -11,6 +11,7 @@ class Place(SqlAlchemyBase):
     description = Column(Text)
     position = Column(String)
     category_id = Column(Integer, ForeignKey('place_categories.id'), nullable=False)
+    image_url = Column(String)
 
     category = relationship("PlaceCategory")
     events = relationship("Event")
@@ -25,5 +26,6 @@ class Place(SqlAlchemyBase):
                 'category_id': self.category_id,
                 'category_name': self.category.name,
                 'category_parent_id': self.category.parent_id
-            }
+            },
+            'image_url': self.image_url
         }
