@@ -23,6 +23,7 @@ def get_place_by_id(place_id):
     finally:
         db_sess.close()
 
+
 # GET Places: Find, filter, search, and paginate place data
 @places_api_bp.route('/places', methods=['GET'])
 def find_places():
@@ -202,6 +203,19 @@ def get_events_for_place(place_id):
 
 
 # --- PlaceCategory API Endpoints ---
+
+# GET basic categories (where parent_id is null)
+@places_api_bp.route('/place_categories/basic', methods=['GET'])
+def get_basic_categories():
+    db_sess = db_session.create_session()
+    try:
+        basic_categories = db_sess.query(PlaceCategory).filter(PlaceCategory.parent_id.is_(None)).all()
+        return jsonify([category.to_dict() for category in basic_categories]), 200
+    except Exception as e:
+        return jsonify({"message": f"Error retrieving basic categories: {str(e)}"}), 500
+    finally:
+        db_sess.close()
+
 
 # GET a specific PlaceCategory by ID
 @places_api_bp.route('/place_categories/<int:category_id>', methods=['GET'])

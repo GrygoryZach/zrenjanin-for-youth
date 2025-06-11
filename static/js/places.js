@@ -1,5 +1,5 @@
 const searchInput = document.getElementById('search-input');
-const filterCheckboxes = document.querySelectorAll(".filters input[type='checkbox']");
+let filterCheckboxes = document.querySelectorAll(".filters input[type='checkbox']");
 const placesResultsDiv = document.querySelector(".places-grid-container");
 const loadingMessage = document.getElementById('loading-message');
 const errorMessage = document.getElementById('error-message');
@@ -14,39 +14,47 @@ const mapContainer = document.getElementById("map");
 
 let places_data = [];
 
-// Waiting for the DOM to load
-document.addEventListener("DOMContentLoaded", function() {
-    openMapButton.addEventListener("click", () => {
-        openMap(mapModal, mapContainer, places_data);
-    });
-    closeMapButton.addEventListener("click", () => {
-        closeMapModal(mapModal, mapContainer);
-    });
+const categoriesFilterDiv = document.querySelector(".filters .category-filters");
 
-    // Listen to changes in the filters
-    filterCheckboxes.forEach(checkbox => {
-        checkbox.addEventListener("change", () => {
-            filterPlacesByCategory(places_data, filterCheckboxes);
-        });
-    });
-
-    // Request is sent only when the search button is clicked
-    searchButton.addEventListener("click", () => {
-        currentPage = 1;
-        performSearch();
-    });
-
-    searchInput.addEventListener("keydown", (event) => {
-        if (event.key === "Enter") {
-            event.preventDefault();
-            currentPage = 1;
-            performSearch();
+async function fetchAndDisplayCategories() {
+    try {
+        const response = await fetch('/api/place_categories/basic');
+        if (!response.ok) {
+            throw new Error(`HTTP error! Status: ${response.status}`);
         }
-    });
+        const categories = await response.json();
 
+        if (categoriesFilterDiv) {
+            categoriesFilterDiv.innerHTML = '<h3>Kategorije</h3>';
+
+            categories.forEach(category => {
+                const label = document.createElement('label');
+                // Using category.name for both value and displayed text.
+                // Your backend's find_places endpoint filters by PlaceCategory.name.
+                label.innerHTML = `<input type="checkbox" name="category" value="${category.name}"> ${category.name}`;
+                categoriesFilterDiv.appendChild(label);
+                categoriesFilterDiv.appendChild(document.createElement('br'));
+            });
+
+            filterCheckboxes = document.querySelectorAll(".filters input[type='checkbox']");
+            filterCheckboxes.forEach(checkbox => {
+                checkbox.addEventListener("change", () => {
+                    filterPlacesByCategory();
+                });
+            });
+        }
+    } catch (error) {
+        console.error('Error fetching categories:', error);
+        if (categoriesFilterDiv) {
+            categoriesFilterDiv.innerHTML = '<h3>Kategorije</h3><p>Greška pri učitavanju kategorija.</p>';
+        }
+    }
+}
+
+function filterPlacesByCategory() {
+    currentPage = 1;
     performSearch();
-});
-
+}
 
 function openMap(mapModal, mapContainer, places) {
     mapModal.classList.remove("hidden");
@@ -55,7 +63,7 @@ function openMap(mapModal, mapContainer, places) {
             initializeMap(mapContainer, places);
             mapModal.dataset.initialized = "true";
         } else {
-            const map = L.Map.get(mapContainer);
+            const map = mapContainer.mapInstance;
             if (map) {
                 map.invalidateSize();
             }
@@ -68,8 +76,9 @@ function closeMapModal(mapModal) {
 }
 
 function initializeMap(mapContainer, places) {
-    if (mapContainer._leaflet_id) {
-        mapContainer._leaflet_id = null;
+    if (mapContainer.mapInstance) {
+        mapContainer.mapInstance.remove();
+        mapContainer.mapInstance = null;
     }
 
     const map = L.map(mapContainer, {
@@ -82,6 +91,7 @@ function initializeMap(mapContainer, places) {
     L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
         attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
     }).addTo(map);
+    map.invalidateSize();
     const bounds = new L.LatLngBounds();
 
     if (places && places.length > 0) {
@@ -103,9 +113,7 @@ function initializeMap(mapContainer, places) {
             }
         });
 
-        map.fitBounds(bounds, { padding: [50, 50] });
-        const currentZoom = map.getZoom();
-        map.setZoom(Math.max(currentZoom - 0.25, 1));
+        map.fitBounds(bounds, { padding: [5, 5] });
     } else {
         console.warn("No places data available to display on the map.");
         map.setView([45.38036, 20.39056], 13);
@@ -219,6 +227,28 @@ function updatePaginationControls() {
 }
 
 document.addEventListener("DOMContentLoaded", function() {
+    fetchAndDisplayCategories();
+
+    openMapButton.addEventListener("click", () => {
+        openMap(mapModal, mapContainer, places_data);
+    });
+    closeMapButton.addEventListener("click", () => {
+        closeMapModal(mapModal, mapContainer);
+    });
+
+    searchButton.addEventListener("click", () => {
+        currentPage = 1;
+        performSearch();
+    });
+
+    searchInput.addEventListener("keydown", (event) => {
+        if (event.key === "Enter") {
+            event.preventDefault();
+            currentPage = 1;
+            performSearch();
+        }
+    });
+
     const prevPageButton = document.getElementById('prevPageButton');
     const nextPageButton = document.getElementById('nextPageButton');
 
@@ -239,4 +269,6 @@ document.addEventListener("DOMContentLoaded", function() {
             }
         });
     }
+
+    performSearch();
 });
