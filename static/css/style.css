@@ -26,15 +26,15 @@ body {
 
 .top-bar input[type="text"] {
     flex-grow: 1;
-    margin-right: 10px; /* Space between input and first button */
+    margin-right: 10px;
     padding: 8px;
     border: 1px solid #ddd;
     border-radius: 4px;
 }
 
 #search-input {
-    width: 60%; /* This might need adjustment if you want it to fill more space or be fixed */
-    max-width: 400px; /* Optional: limit max width for better aesthetics */
+    width: 60%;
+    max-width: 400px;
 }
 
 .top-bar button {
@@ -46,13 +46,12 @@ body {
     cursor: pointer;
     font-size: 1em;
     transition: background-color 0.2s;
-    margin-left: 10px; /* Space between buttons */
+    margin-left: 10px;
 }
 
-.top-bar button:first-of-type { /* Adjust margin for the first button in top-bar */
+.top-bar button:first-of-type {
     margin-left: 0;
 }
-
 
 .top-bar button:hover {
     background-color: #0056b3;
@@ -177,7 +176,7 @@ body {
     transition: background-color 0.2s;
 }
 
-.more-btn { /* Этот стиль может быть убран, если вы не используете его отдельно от place-card */
+.more-btn {
     text-align: center;
     display: block;
     border-top: 1px solid #ddd;
@@ -186,8 +185,6 @@ body {
 .place-card .more-btn:hover {
     background-color: #5a6268;
 }
-/* --- Конец стилей карточек --- */
-
 
 .pagination {
     display: flex;
@@ -228,8 +225,8 @@ body {
     color: #555;
 }
 
-.map-modal {
-    display: none; /* По умолчанию окно скрыто */
+.map-modal   {
+    display: none;
     position: fixed;
     z-index: 1000;
     left: 0;

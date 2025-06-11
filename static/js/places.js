@@ -3,7 +3,7 @@ const filterCheckboxes = document.querySelectorAll(".filters input[type='checkbo
 const placesResultsDiv = document.querySelector(".places-grid-container");
 const loadingMessage = document.getElementById('loading-message');
 const errorMessage = document.getElementById('error-message');
-const searchButton = document.getElementById('search-button'); // New element: search button
+const searchButton = document.getElementById('search-button');
 
 let currentPage = 1;
 let totalPages = 1;
@@ -12,48 +12,55 @@ const mapModal = document.getElementById("map-modal");
 const closeMapButton = document.querySelector(".close-map");
 const mapContainer = document.getElementById("map");
 
-let places_data = []; // PLaces data (should be uploaded from server)
+let places_data = [];
 
 // Waiting for the DOM to load
 document.addEventListener("DOMContentLoaded", function() {
     openMapButton.addEventListener("click", () => {
-        openMap(mapModal, mapContainer, places_data)
+        openMap(mapModal, mapContainer, places_data);
     });
     closeMapButton.addEventListener("click", () => {
-        closeMapModal(mapModal, mapContainer)
+        closeMapModal(mapModal, mapContainer);
     });
-
-    // Handle input in the search field
-    searchInput.addEventListener("input", (event) => {
-        searchFunction(event.target, places_data);
-    });
-
 
     // Listen to changes in the filters
     filterCheckboxes.forEach(checkbox => {
         checkbox.addEventListener("change", () => {
-            filterPlacesByCategory(places, filterCheckboxes);
+            filterPlacesByCategory(places_data, filterCheckboxes);
         });
     });
 
-    // --- Event Listeners ---
-
     // Request is sent only when the search button is clicked
     searchButton.addEventListener("click", () => {
-        currentPage = 1; // Always reset to the first page for a new search/filter
+        currentPage = 1;
         performSearch();
     });
 
-    performSearch()
+    searchInput.addEventListener("keydown", (event) => {
+        if (event.key === "Enter") {
+            event.preventDefault();
+            currentPage = 1;
+            performSearch();
+        }
+    });
+
+    performSearch();
 });
 
 
 function openMap(mapModal, mapContainer, places) {
     mapModal.classList.remove("hidden");
-    if (!mapModal.dataset.initialized) {
-        initializeMap(mapContainer, places);
-        mapModal.dataset.initialized = "true";
-    }
+    setTimeout(() => {
+        if (!mapModal.dataset.initialized) {
+            initializeMap(mapContainer, places);
+            mapModal.dataset.initialized = "true";
+        } else {
+            const map = L.Map.get(mapContainer);
+            if (map) {
+                map.invalidateSize();
+            }
+        }
+    }, 50);
 }
 
 function closeMapModal(mapModal) {
@@ -61,6 +68,10 @@ function closeMapModal(mapModal) {
 }
 
 function initializeMap(mapContainer, places) {
+    if (mapContainer._leaflet_id) {
+        mapContainer._leaflet_id = null;
+    }
+
     const map = L.map(mapContainer, {
         center: [45.38036, 20.39056], // Zrenjanin city center
         zoom: 15,
@@ -68,37 +79,41 @@ function initializeMap(mapContainer, places) {
         zoomDelta: 1
     });
 
-    // Basic map layers
     L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
         attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
     }).addTo(map);
-    const bounds = new L.LatLngBounds(); // Create a bounds object to contain all markers
+    const bounds = new L.LatLngBounds();
 
-    // Add markers for each place
-    places.forEach(place => {
-        const [latStr, lngStr] = place.position.split(',');
-        const latitude = parseFloat(latStr);
-        const longitude = parseFloat(lngStr);
-        const marker = L.marker([latitude, longitude]).addTo(map);
-        marker.bindPopup(`
-            <strong>${place.name}</strong><br>
-            <p>${place.short_description}</p>
-            <a href="/places/${place.id}">Više</a>
-        `);
-        bounds.extend([latitude, longitude]); // Extend the bounds to include each marker's position
-    });
+    if (places && places.length > 0) {
+        places.forEach(place => {
+            const [latStr, lngStr] = place.position.split(',');
+            const latitude = parseFloat(latStr);
+            const longitude = parseFloat(lngStr);
 
-    // Fit map bounds to include all places
-    map.fitBounds(bounds);
+            if (!isNaN(latitude) && !isNaN(longitude)) {
+                const marker = L.marker([latitude, longitude]).addTo(map);
+                marker.bindPopup(`
+                    <strong>${place.name}</strong><br>
+                    <p>${place.short_description || 'No description'}</p>
+                    <a href="/places/${place.id}">Više</a>
+                `);
+                bounds.extend([latitude, longitude]);
+            } else {
+                console.warn(`Invalid coordinates for place: ${place.name} (${place.position})`);
+            }
+        });
 
-    // Adjust zoom level to be a bit smaller (zoom out by 1 level)
-    const currentZoom = map.getZoom(); // Get the current zoom level after fitBounds
-    map.setZoom(currentZoom - 0.25); // Zoom out by 1 level (adjust this value as needed)
+        map.fitBounds(bounds, { padding: [50, 50] });
+        const currentZoom = map.getZoom();
+        map.setZoom(Math.max(currentZoom - 0.25, 1));
+    } else {
+        console.warn("No places data available to display on the map.");
+        map.setView([45.38036, 20.39056], 13);
+    }
+
+    mapContainer.mapInstance = map;
 }
 
-
-
-// --- Asynchronous JavaScript function to make an API request ---
 async function getPlaces(options = {}) {
     const { page = 1, per_page = 10, search = '', categories = [] } = options;
 
@@ -130,7 +145,6 @@ async function getPlaces(options = {}) {
         throw error;
     }
 }
-
 
 async function performSearch() {
     if (loadingMessage) loadingMessage.style.display = 'block';
@@ -165,6 +179,7 @@ async function performSearch() {
 
         currentPage = page;
         totalPages = total_pages;
+        updatePaginationControls();
     } catch (error) {
         if (loadingMessage) loadingMessage.style.display = 'none';
         if (errorMessage) errorMessage.style.display = 'block';
@@ -184,10 +199,44 @@ function displayPlaces(filteredPlaces) {
         placeCard.innerHTML = `
             <img src="${place.image_url || '/static/img/placeholder.jpg'}" alt="${place.name}">
             <h4>${place.name}</h4>
-            <p class="category">${place.category ? place.category.name : 'Not specified'}</p>
+            <p class="category">${place.category && place.category.name ? place.category.name : 'Not specified'}</p>
             <p class="short-desc">${place.short_description || place.description || 'No description available'}</p>
             <a href="/places/${place.id}" class="more-btn">Više</a>
         `;
         placesResultsDiv.appendChild(placeCard);
     });
 }
+
+// Doesn't work yet
+function updatePaginationControls() {
+    const prevButton = document.getElementById('prevPageButton');
+    const nextButton = document.getElementById('nextPageButton');
+    const currentPageInfo = document.getElementById('currentPageInfo');
+
+    if (prevButton) prevButton.disabled = currentPage <= 1;
+    if (nextButton) nextButton.disabled = currentPage >= totalPages;
+    if (currentPageInfo) currentPageInfo.textContent = `Stranica ${currentPage} od ${totalPages}`;
+}
+
+document.addEventListener("DOMContentLoaded", function() {
+    const prevPageButton = document.getElementById('prevPageButton');
+    const nextPageButton = document.getElementById('nextPageButton');
+
+    if (prevPageButton) {
+        prevPageButton.addEventListener('click', () => {
+            if (currentPage > 1) {
+                currentPage--;
+                performSearch();
+            }
+        });
+    }
+
+    if (nextPageButton) {
+        nextPageButton.addEventListener('click', () => {
+            if (currentPage < totalPages) {
+                currentPage++;
+                performSearch();
+            }
+        });
+    }
+});
