@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="sr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Zrenjanin za Mlade: Tvoj Vodič za Provod!</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&family=Open+Sans:wght@400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../static/css/main_page.css">
+</head>
+<body>
+    <header class="top-nav-header">
+        <div class="container">
+            <a href="/" class="logo">Zrenjanin za Mlade</a>
+            <nav>
+                <ul>
+                    <li><a href="#">O nama</a></li>
+                    <li><a href="#">Galerija</a></li>
+                    <li><a href="#">Kontakt</a></li>
+                    <li><a href="#">Predloži nešto</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <section class="hero-section">
+        <div class="container">
+            <h1>Zrenjanin za Mlade</h1>
+            <p>Tvoj vodič za najbolja mesta i nezaboravne događaje u gradu!</p>
+            <div class="hero-cta">
+                <a href="#featuredPlaces">Istraži Mesta</a>
+                <a href="#featuredEvents">Pogledaj Događaje</a>
+            </div>
+        </div>
+    </section>
+
+    <main class="container">
+        <section class="search-section">
+            <input type="text" id="searchInput" placeholder="Pretraži mesta ili događaje...">
+            <div class="category-filter">
+                <button class="active" data-category="all">Sve</button>
+                <button data-category="places">Mesta</button>
+                <button data-category="events">Događaji</button>
+            </div>
+            <button type="submit" id="search-button">Pretraži</button>
+        </section>
+
+        <section id="featuredEvents" class="featured-section">
+            <h2>Aktuelni Događaji</h2>
+            <div class="card-grid" id="eventsGrid">
+                </div>
+        </section>
+
+        <section id="featuredPlaces" class="featured-section">
+            <h2>Popularna Mesta</h2>
+            <div class="card-grid" id="placesGrid">
+                </div>
+        </section>
+
+        <section id="searchResults" style="display: none;">
+            <h2>Rezultati Pretrage</h2>
+            <div class="card-grid" id="searchResultGrid">
+                </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2025 Zrenjanin za Mlade. Sva prava zadržana.</p>
+        </div>
+    </footer>
+
+    <script src="../static/js/main_page.js"></script>
+</body>
+</html>
