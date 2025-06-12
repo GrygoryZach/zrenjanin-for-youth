@@ -24,7 +24,7 @@
             <div class="category-filters">
                 <h3>Kategorije</h3>
             </div>
-            <label for="perPageSelect">Razultata po stranici:</label>
+            <label for="perPageSelect">Rezultata po stranici:</label>
             <select id="perPageSelect">
                 <option value="5">5</option>
                 <option value="10" selected>10</option>
@@ -33,19 +33,25 @@
             <br><br>
         </aside>
 
-        <section class="places-grid-container"><h2>Rezultati pretrage</h2>
-            <p id="loading-message">Učitavanje rezultata...</p>
-            <p id="error-message">Došlo je do greške prilikom učitavanja.</p>
-            <div id="placesResults">
-                <p>Krenite da pretražujete da biste videli rezultate.</p>
-            </div>
-            <footer class="pagination">
-                <button id="prevPageButton" disabled>Prošla</button>
-                <span id="currentPageInfo">Stranica 1 od 1</span>
-                <button id="nextPageButton" disabled>Sledeća</button>
-            </footer>
-        </section>
+        <div class="content-wrapper">
+            <section class="places-grid-container">
+                <h2>Rezultati pretrage</h2>
+                <p id="loading-message">Učitavanje rezultata...</p>
+                <p id="error-message" class="hidden">Došlo je do greške prilikom učitavanja.</p>
+                <div id="placesResults">
+                    <p>Krenite da pretražujete da biste videli rezultate.</p>
+                </div>
+            </section>
+        </div>
     </div>
+    <div class="pagination" style="text-align:center; margin-top:20px;">
+    <button id="prevPageButton" disabled>Prethodna</button>
+    <!-- Здесь JS вставит кнопки с номерами страниц -->
+    <button id="nextPageButton" disabled>Sledeća</button>
+    </div>
+    <div id="currentPageInfo" style="text-align:center; margin-top:8px; font-weight: bold;">
+              Stranica 1 od 2
+            </div>
 </div>
 
 <div id="map-modal" class="map-modal hidden">

@@ -1,12 +1,13 @@
 const searchInput = document.getElementById('search-input');
 let filterCheckboxes = document.querySelectorAll(".filters input[type='checkbox']");
-const placesResultsDiv = document.querySelector(".places-grid-container");
+const placesResultsDiv = document.getElementById("placesResults");
 const loadingMessage = document.getElementById('loading-message');
 const errorMessage = document.getElementById('error-message');
 const searchButton = document.getElementById('search-button');
 
 let currentPage = 1;
 let totalPages = 1;
+let itemsPerPage = 10;
 const openMapButton = document.getElementById("toggle-map");
 const mapModal = document.getElementById("map-modal");
 const closeMapButton = document.querySelector(".close-map");
@@ -15,6 +16,12 @@ const mapContainer = document.getElementById("map");
 let places_data = [];
 
 const categoriesFilterDiv = document.querySelector(".filters .category-filters");
+const perPageSelect = document.getElementById('perPageSelect');
+
+let paginationContainer;
+let prevPageButton;
+let nextPageButton;
+let currentPageInfo;
 
 async function fetchAndDisplayCategories() {
     try {
@@ -33,7 +40,6 @@ async function fetchAndDisplayCategories() {
                 // Your backend's find_places endpoint filters by PlaceCategory.name.
                 label.innerHTML = `<input type="checkbox" name="category" value="${category.name}"> ${category.name}`;
                 categoriesFilterDiv.appendChild(label);
-                categoriesFilterDiv.appendChild(document.createElement('br'));
             });
 
             filterCheckboxes = document.querySelectorAll(".filters input[type='checkbox']");
@@ -56,6 +62,7 @@ function filterPlacesByCategory() {
     performSearch();
 }
 
+// TODO обновление маркеров при поиске или фильстрации по категориям
 function openMap(mapModal, mapContainer, places) {
     mapModal.classList.remove("hidden");
     setTimeout(() => {
@@ -164,8 +171,6 @@ async function performSearch() {
         .filter(checkbox => checkbox.checked)
         .map(checkbox => checkbox.value);
 
-    const itemsPerPage = 10;
-
     try {
         const result = await getPlaces({
             page: currentPage,
@@ -215,18 +220,60 @@ function displayPlaces(filteredPlaces) {
     });
 }
 
-// Doesn't work yet
-function updatePaginationControls() {
-    const prevButton = document.getElementById('prevPageButton');
-    const nextButton = document.getElementById('nextPageButton');
-    const currentPageInfo = document.getElementById('currentPageInfo');
 
-    if (prevButton) prevButton.disabled = currentPage <= 1;
-    if (nextButton) nextButton.disabled = currentPage >= totalPages;
-    if (currentPageInfo) currentPageInfo.textContent = `Stranica ${currentPage} od ${totalPages}`;
+function updatePaginationControls() {
+    currentPageInfo.textContent = `Stranica ${currentPage} od ${totalPages}`;
+
+    // Удаляем старые кнопки с номерами страниц
+    document.querySelectorAll('.page-number-button').forEach(button => button.remove());
+
+    // Управление активностью кнопок "Prethodna" и "Sledeća"
+    prevPageButton.disabled = currentPage <= 1;
+    nextPageButton.disabled = currentPage >= totalPages;
+
+    const maxButtons = 5;
+    let startPage, endPage;
+
+    if (totalPages <= maxButtons) {
+        startPage = 1;
+        endPage = totalPages;
+    } else if (currentPage <= Math.ceil(maxButtons / 2)) {
+        startPage = 1;
+        endPage = maxButtons;
+    } else if (currentPage + Math.floor(maxButtons / 2) >= totalPages) {
+        startPage = totalPages - maxButtons + 1;
+        endPage = totalPages;
+    } else {
+        startPage = currentPage - Math.floor(maxButtons / 2);
+        endPage = currentPage + Math.floor(maxButtons / 2);
+    }
+
+    for (let i = startPage; i <= endPage; i++) {
+        const pageButton = document.createElement('button');
+        pageButton.classList.add('page-number-button');
+        pageButton.textContent = i;
+        if (i === currentPage) {
+            pageButton.disabled = true;
+        }
+        pageButton.addEventListener('click', () => {
+            currentPage = i;
+            performSearch();
+        });
+        paginationContainer.insertBefore(pageButton, nextPageButton);
+    }
 }
 
+
 document.addEventListener("DOMContentLoaded", function() {
+    paginationContainer = document.querySelector('.pagination');
+    prevPageButton = document.getElementById('prevPageButton');
+    nextPageButton = document.getElementById('nextPageButton');
+    currentPageInfo = document.getElementById('currentPageInfo');
+
+    if (!paginationContainer || !prevPageButton || !nextPageButton || !currentPageInfo) {
+        console.error("Critical: One or more pagination elements were not found in the DOM.");
+        return;
+    }
     fetchAndDisplayCategories();
 
     openMapButton.addEventListener("click", () => {
@@ -249,26 +296,27 @@ document.addEventListener("DOMContentLoaded", function() {
         }
     });
 
-    const prevPageButton = document.getElementById('prevPageButton');
-    const nextPageButton = document.getElementById('nextPageButton');
-
-    if (prevPageButton) {
-        prevPageButton.addEventListener('click', () => {
-            if (currentPage > 1) {
-                currentPage--;
-                performSearch();
-            }
+    if (perPageSelect) {
+        perPageSelect.addEventListener('change', () => {
+            itemsPerPage = parseInt(perPageSelect.value, 10);
+            currentPage = 1;
+            performSearch();
         });
     }
 
-    if (nextPageButton) {
-        nextPageButton.addEventListener('click', () => {
-            if (currentPage < totalPages) {
-                currentPage++;
-                performSearch();
-            }
-        });
-    }
+    prevPageButton.addEventListener('click', () => {
+        if (currentPage > 1) {
+            currentPage--;
+            performSearch();
+        }
+    });
+
+    nextPageButton.addEventListener('click', () => {
+        if (currentPage < totalPages) {
+            currentPage++;
+            performSearch();
+        }
+    });
 
     performSearch();
 });
