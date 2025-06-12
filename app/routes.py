@@ -8,6 +8,10 @@ def main_page():
     return render_template("main_page.html")
 
 
+@bp.route('/about')
+def about():
+    return render_template("about.html")
+
 
 @bp.route('/place_search')
 def place_search():

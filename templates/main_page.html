@@ -2,9 +2,11 @@
 
 {% block title %}Početna — Zanimljiva mesta{% endblock %}
 
-{% block content %}
+{% block head %}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/main_page.css') }}">
+{% endblock %}
 
+{% block content %}
 <section class="hero">
     <h1>Dobrodošli u Zrenjanin Explorer</h1>
     <p>Istražite zanimljiva mesta u gradu Zrenjaninu</p>
@@ -41,6 +43,8 @@
         </div>
     </div>
 </section>
+{% endblock %}
 
+{% block scripts %}
 <script src="{{ url_for('static', filename='js/main_page.js') }}" defer></script>
 {% endblock %}
