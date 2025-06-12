@@ -1,51 +1,41 @@
-{% extends "base.html" %}
-
-{% block title %}{{ place.name }} — Zrenjanin Explorer{% endblock %}
-
-{% block head %}
-<link rel="stylesheet" href="{{ url_for('static', filename='css/place_details.css') }}">
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" defer></script>
-<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-{% endblock %}
-
+{% extends 'base.html' %}
 {% block content %}
-<div class="place-details-container container">
-    <button onclick="history.back()" class="btn-back">← Nazad</button>
+<link rel="stylesheet" href="{{ url_for('static', filename='css/place_details.css') }}">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 
-    <h1 class="place-title">{{ place.name }}</h1>
-    <p class="place-category">{{ place.category.category_name }}</p>
-
-    <div class="place-photo">
-        <img src="{{ place.image_url }}" alt="{{ place.name }}">
+<div class="place-page">
+  <a onclick="history.back()" class="back-btn">Nazad</a>
+  <div class="place-layout">
+    <div class="left">
+      <img src="{{ place.image_url or url_for('static', filename='placeholder.jpg') }}">
+      <div id="place-map"></div>
     </div>
-
-    <p class="place-description">{{ place.description }}</p>
-
-    {% if place.address %}
-    <p class="place-address"><strong>Adresa:</strong> {{ place.address }}</p>
-    {% endif %}
-
-    <div id="place-map" class="place-map"></div>
+    <div class="right">
+      <h1>{{ place.name }}</h1>
+      <p><strong>Adresa: </strong> {{ place.address }}</p>
+      <p>{{ place.description }}</p>
+    </div>
+  </div>
+  <div class="events-block">
+    <h2>Povezani događaji</h2>
+    <div id="related-events">Učitava se...</div>
+  </div>
 </div>
-{% endblock %}
 
-{% block scripts %}
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
 <script>
-document.addEventListener('DOMContentLoaded', () => {
-    const [latStr, lngStr] = place.position.split(',');
-    const latitude = parseFloat(latStr);
-    const longitude = parseFloat(lngStr);
-    const map = L.map('place-map').setView([{{ latitude }}, {{ longitude }}], 13);
+  const [latStr, lngStr] = "{{ place.position }}".split(',');
+  const latitude = parseFloat(latStr);
+  const longitude = parseFloat(lngStr);
 
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        maxZoom: 19,
-        attribution: '&copy; OpenStreetMap contributors'
-    }).addTo(map);
+  const map = L.map('place-map').setView([latitude, longitude], 16);
 
-    L.marker([{{ place.latitude }}, {{ place.longitude }}])
-        .addTo(map)
-        .bindPopup('{{ place.name }}')
-        .openPopup();
-});
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: '&copy; <a href="https://openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+  }).addTo(map);
+
+  L.marker([latitude, longitude]).addTo(map)
+    .bindPopup('{{ place.name | escape }}');
 </script>
 {% endblock %}
