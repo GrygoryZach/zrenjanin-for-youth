@@ -202,8 +202,6 @@ def get_events_for_place(place_id):
         db_sess.close()
 
 
-# --- PlaceCategory API Endpoints ---
-
 # GET basic categories (where parent_id is null)
 @places_api_bp.route('/place_categories/basic', methods=['GET'])
 def get_basic_categories():
@@ -216,6 +214,8 @@ def get_basic_categories():
     finally:
         db_sess.close()
 
+
+# --- PlaceCategory API Endpoints ---
 
 # GET a specific PlaceCategory by ID
 @places_api_bp.route('/place_categories/<int:category_id>', methods=['GET'])

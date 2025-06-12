@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+
+{% block title %}{{ place.name }} — Zrenjanin Explorer{% endblock %}
+
+{% block head %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/place_details.css') }}">
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" defer></script>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+{% endblock %}
+
+{% block content %}
+<div class="place-details-container container">
+    <button onclick="history.back()" class="btn-back">← Nazad</button>
+
+    <h1 class="place-title">{{ place.name }}</h1>
+    <p class="place-category">{{ place.category.category_name }}</p>
+
+    <div class="place-photo">
+        <img src="{{ place.image_url }}" alt="{{ place.name }}">
+    </div>
+
+    <p class="place-description">{{ place.description }}</p>
+
+    {% if place.address %}
+    <p class="place-address"><strong>Adresa:</strong> {{ place.address }}</p>
+    {% endif %}
+
+    <div id="place-map" class="place-map"></div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    const [latStr, lngStr] = place.position.split(',');
+    const latitude = parseFloat(latStr);
+    const longitude = parseFloat(lngStr);
+    const map = L.map('place-map').setView([{{ latitude }}, {{ longitude }}], 13);
+
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        maxZoom: 19,
+        attribution: '&copy; OpenStreetMap contributors'
+    }).addTo(map);
+
+    L.marker([{{ place.latitude }}, {{ place.longitude }}])
+        .addTo(map)
+        .bindPopup('{{ place.name }}')
+        .openPopup();
+});
+</script>
+{% endblock %}
