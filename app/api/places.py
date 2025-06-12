@@ -107,6 +107,7 @@ def create_place():
             name=data['name'],
             description=data.get('description'),
             position=data.get('position'),
+            address=data.get('address'),
             category_id=data['category_id']
         )
         db_sess.add(new_place)
@@ -216,6 +217,19 @@ def get_basic_categories():
 
 
 # --- PlaceCategory API Endpoints ---
+
+# GET all PlaceCategories
+@places_api_bp.route('/place_categories', methods=['GET'])
+def get_all_place_categories():
+    db_sess = db_session.create_session()
+    try:
+        categories = db_sess.query(PlaceCategory).all()
+        return jsonify([category.to_dict() for category in categories]), 200
+    except Exception as e:
+        return jsonify({"message": f"Error retrieving place categories: {str(e)}"}), 500
+    finally:
+        db_sess.close()
+
 
 # GET a specific PlaceCategory by ID
 @places_api_bp.route('/place_categories/<int:category_id>', methods=['GET'])
