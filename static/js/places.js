@@ -62,7 +62,6 @@ function filterPlacesByCategory() {
     performSearch();
 }
 
-// TODO обновление маркеров при поиске или фильстрации по категориям
 function openMap(mapModal, mapContainer, places) {
     mapModal.classList.remove("hidden");
     setTimeout(() => {
@@ -75,7 +74,7 @@ function openMap(mapModal, mapContainer, places) {
                 map.invalidateSize();
             }
         }
-    }, 50);
+    }, 200);
 }
 
 function closeMapModal(mapModal) {
@@ -120,7 +119,15 @@ function initializeMap(mapContainer, places) {
             }
         });
 
-        map.fitBounds(bounds, { padding: [5, 5] });
+        if (bounds.isValid()) {
+            if (bounds.getSouthWest().equals(bounds.getNorthEast())) {
+                map.setView(bounds.getCenter(), 16);
+            } else {
+                map.fitBounds(bounds, { padding: [50, 50] });
+            }
+        } else {
+            map.setView([45.38036, 20.39056], 13);
+        }
     } else {
         console.warn("No places data available to display on the map.");
         map.setView([45.38036, 20.39056], 13);
@@ -193,6 +200,8 @@ async function performSearch() {
         currentPage = page;
         totalPages = total_pages;
         updatePaginationControls();
+
+        initializeMap(mapContainer, places_data);
     } catch (error) {
         if (loadingMessage) loadingMessage.style.display = 'none';
         if (errorMessage) errorMessage.style.display = 'block';
@@ -317,6 +326,5 @@ document.addEventListener("DOMContentLoaded", function() {
             performSearch();
         }
     });
-
     performSearch();
 });
