@@ -246,11 +246,10 @@ function displayPlaces(filteredPlaces) {
     filteredPlaces.forEach(place => {
         const placeCard = document.createElement('div');
         placeCard.classList.add('place-card');
-
         placeCard.innerHTML = `
             <img src="${place.image_url || '/static/img/placeholder.jpg'}" alt="${place.name}">
             <h4>${place.name}</h4>
-            <p class="category">${place.category && place.category.name ? place.category.name : 'Not specified'}</p>
+            <p class="category">${place.category && place.category.category_name ? place.category.category_name : 'Not specified'}</p>
             <p class="short-desc">${place.short_description || place.description || 'No description available'}</p>
             <a href="/places/${place.id}" class="more-btn">Više</a>
         `;

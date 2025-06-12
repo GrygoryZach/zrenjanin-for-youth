@@ -10,6 +10,7 @@ class Place(SqlAlchemyBase):
     name = Column(String, nullable=False)
     description = Column(Text)
     position = Column(String)
+    address = Column(String)
     category_id = Column(Integer, ForeignKey('place_categories.id'), nullable=False)
     image_url = Column(String)
 
@@ -22,6 +23,7 @@ class Place(SqlAlchemyBase):
             'name': self.name,
             'description': self.description,
             'position': self.position,
+            'address': self.address,
             'category': {
                 'category_id': self.category_id,
                 'category_name': self.category.name,
