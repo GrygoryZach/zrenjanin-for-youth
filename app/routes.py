@@ -34,4 +34,4 @@ def index():
             "short_description": "Tradicija duga 26 godina, poznat po prijatnoj atmosferi i ljubavi prema dobroj kafi."
         }
     ]
-    return render_template("index.html", places=places, page=1, has_next=True)
+    return render_template("place_search.html", places=places, page=1, has_next=True)
