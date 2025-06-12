@@ -168,7 +168,36 @@ async function getPlaces(options = {}) {
     }
 }
 
+function updateURLWithSearch() {
+    const params = new URLSearchParams();
+
+    const searchTerm = searchInput.value.trim();
+    if (searchTerm) {
+        params.set('search', searchTerm);
+    }
+
+    const selectedCategories = Array.from(filterCheckboxes)
+        .filter(cb => cb.checked)
+        .map(cb => cb.value);
+
+    if (selectedCategories.length > 0) {
+        params.set('categories', selectedCategories.join(','));
+    }
+
+    if (currentPage !== 1) {
+        params.set('page', currentPage);
+    }
+
+    if (itemsPerPage !== 10) {
+        params.set('per_page', itemsPerPage);
+    }
+
+    const newUrl = `${window.location.pathname}?${params.toString()}`;
+    window.history.replaceState({}, '', newUrl);
+}
+
 async function performSearch() {
+    updateURLWithSearch();
     if (loadingMessage) loadingMessage.style.display = 'block';
     if (errorMessage) errorMessage.style.display = 'none';
     placesResultsDiv.innerHTML = '';
@@ -264,8 +293,8 @@ function updatePaginationControls() {
         if (i === currentPage) {
             pageButton.disabled = true;
         }
-        pageButton.addEventListener('click', () => {
-            currentPage = i;
+        searchButton.addEventListener('click', () => {
+            currentPage = 1;
             performSearch();
         });
         paginationContainer.insertBefore(pageButton, nextPageButton);
@@ -326,5 +355,11 @@ document.addEventListener("DOMContentLoaded", function() {
             performSearch();
         }
     });
+
+    const urlParams = new URLSearchParams(window.location.search);
+    const query = urlParams.get('search');
+    if (query) {
+        searchInput.value = query;
+    }
     performSearch();
 });
