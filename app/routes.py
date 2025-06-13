@@ -27,3 +27,12 @@ def place_details(place_id: int):
     place_dict = place.to_dict()
     return render_template("place_details.html", place=place_dict)
 
+
+@bp.route('/events/<int:event_id>')
+def event_details(event_id):
+    return render_template('event_details.html', event_id=event_id)
+
+
+@bp.route('/event_search')
+def event_search():
+    return render_template("event_search.html")

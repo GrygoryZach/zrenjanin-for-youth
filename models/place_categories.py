@@ -3,7 +3,6 @@ from db.db_session import SqlAlchemyBase
 from sqlalchemy.orm import relationship
 
 
-
 class PlaceCategory(SqlAlchemyBase):
     __tablename__ = 'place_categories'
 
@@ -15,7 +14,7 @@ class PlaceCategory(SqlAlchemyBase):
 
     def to_dict(self):
         return {
-            "id":self.id,
-            "name":self.name,
+            "id": self.id,
+            "name": self.name,
             "parent": self.parent.to_dict() if self.parent_id is not None else None
         }
