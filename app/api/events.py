@@ -1,19 +1,95 @@
 from flask import Blueprint, jsonify, request
 from sqlalchemy.orm import joinedload
-from sqlalchemy import exc
+from sqlalchemy import exc, or_
 from datetime import datetime
 
-from db.db_session import create_session
+from db import db_session
 from models.__all_models import Event, EventCategory, Place  # Place is imported for the /events/<id>/place route
 
 # Create a Blueprint specifically for Event-related APIs
 events_api_bp = Blueprint('events_api', __name__, url_prefix='/api')
 
 
+@events_api_bp.route('/events', methods=['GET'])
+def find_events():
+    """
+    Query string parameters:
+        page (int, optional): The page number to retrieve. Default is 1.
+        per_page (int, optional): The number of items per page. Default is 10.
+        search (str, optional): A keyword to search for in event names or descriptions.
+        categories (str, optional): A comma-separated string of category names to filter by.
+
+    Returns:
+        JSON: A JSON object containing:
+            - 'events' (list): A list of event dictionaries.
+            - 'total_events' (int): Total number of matching events.
+            - 'page' (int): Current page.
+            - 'per_page' (int): Items per page.
+            - 'total_pages' (int): Total number of pages.
+        Status:
+            200 OK
+            500 Internal Server Error
+    """
+    db_sess = db_session.create_session()
+    try:
+        query = db_sess.query(Event).options(
+            joinedload(Event.category),
+            joinedload(Event.place)
+        )
+
+        # Filter by categories
+        categories_param = request.args.get('categories')
+        if categories_param:
+            categories_list = [c.strip() for c in categories_param.split(',')]
+            query = query.join(Event.category).filter(EventCategory.name.in_(categories_list))
+
+        # Filter by search
+        search_query = request.args.get('search')
+        if search_query:
+            search_pattern = f"%{search_query.lower()}%"
+            query = query.filter(
+                or_(
+                    Event.name.ilike(search_pattern),
+                    Event.description.ilike(search_pattern)
+                )
+            )
+
+        # Pagination
+        page = request.args.get('page', default=1, type=int)
+        per_page = request.args.get('per_page', default=10, type=int)
+
+        total_events = query.count()
+        events = query.offset((page - 1) * per_page).limit(per_page).all()
+
+        # Convert to dicts with place.position included
+        event_dicts = []
+        for event in events:
+            event_data = event.to_dict()
+            event_data['position'] = event.place.position if event.place and hasattr(event.place, 'position') else None
+            event_dicts.append(event_data)
+
+        total_pages = (total_events + per_page - 1) // per_page
+
+        return jsonify({
+            "events": event_dicts,
+            "total_events": total_events,
+            "page": page,
+            "per_page": per_page,
+            "total_pages": total_pages
+        }), 200
+
+    except Exception as e:
+        print(f"Error in find_events: {e}")
+        return jsonify({"message": f"Error retrieving events: {str(e)}"}), 500
+    finally:
+        db_sess.close()
+
+
+
 # GET a specific Event by ID
 @events_api_bp.route('/events/<int:event_id>', methods=['GET'])
 def get_event_by_id(event_id):
-    db_sess = create_session()
+    db_sess = db_session.create_session()
     try:
         # Eager load category for the embedded category in to_dict
         event = db_sess.query(Event).options(
@@ -31,7 +107,7 @@ def get_event_by_id(event_id):
 # POST (Create) a new Event
 @events_api_bp.route('/events', methods=['POST'])
 def create_event():
-    db_sess = create_session()
+    db_sess = db_session.create_session()
     try:
         data = request.json
         if not all(k in data for k in ['name', 'datetime', 'place_id', 'category_id']):
@@ -72,7 +148,7 @@ def create_event():
 # PUT (Update) an existing Event
 @events_api_bp.route('/events/<int:event_id>', methods=['PUT'])
 def update_event(event_id):
-    db_sess = create_session()
+    db_sess = db_session.create_session()
     try:
         data = request.json
         # Eager load category for the embedded category in to_dict for the response
@@ -108,7 +184,7 @@ def update_event(event_id):
 # DELETE an Event
 @events_api_bp.route('/events/<int:event_id>', methods=['DELETE'])
 def delete_event(event_id):
-    db_sess = create_session()
+    db_sess = db_session.create_session()
     try:
         event = db_sess.query(Event).get(event_id)
         if not event:
@@ -127,7 +203,7 @@ def delete_event(event_id):
 # GET the Place for a specific Event
 @events_api_bp.route('/events/<int:event_id>/place', methods=['GET'])
 def get_place_for_event(event_id):
-    db_sess = create_session()
+    db_sess = db_session.create_session()
     try:
         # Eager load place AND its category for the place's to_dict
         event = db_sess.query(Event).options(
@@ -147,10 +223,22 @@ def get_place_for_event(event_id):
 
 # --- EventCategory API Endpoints ---
 
+# GET basic event categories (where parent_id is null)
+@events_api_bp.route('/event_categories/basic', methods=['GET'])
+def get_basic_event_categories():
+    db_sess = db_session.create_session()
+    try:
+        basic_categories = db_sess.query(EventCategory).filter(EventCategory.parent_id.is_(None)).all()
+        return jsonify([category.to_dict() for category in basic_categories]), 200
+    except Exception as e:
+        return jsonify({"message": f"Error retrieving basic event categories: {str(e)}"}), 500
+    finally:
+        db_sess.close()
+
 # GET a specific EventCategory by ID
 @events_api_bp.route('/event_categories/<int:category_id>', methods=['GET'])
 def get_event_category_by_id(category_id):
-    db_sess = create_session()
+    db_sess = db_session.create_session()
     try:
         category = db_sess.query(EventCategory).get(category_id)
         if not category:
@@ -165,7 +253,7 @@ def get_event_category_by_id(category_id):
 # POST (Create) a new EventCategory
 @events_api_bp.route('/event_categories', methods=['POST'])
 def create_event_category():
-    db_sess = create_session()
+    db_sess = db_session.create_session()
     try:
         data = request.json
         if not 'name' in data:
@@ -193,7 +281,7 @@ def create_event_category():
 # PUT (Update) an existing EventCategory
 @events_api_bp.route('/event_categories/<int:category_id>', methods=['PUT'])
 def update_event_category(category_id):
-    db_sess = create_session()
+    db_sess = db_session.create_session()
     try:
         data = request.json
         category = db_sess.query(EventCategory).get(category_id)
@@ -220,7 +308,7 @@ def update_event_category(category_id):
 # DELETE an EventCategory
 @events_api_bp.route('/event_categories/<int:category_id>', methods=['DELETE'])
 def delete_event_category(category_id):
-    db_sess = create_session()
+    db_sess = db_session.create_session()
     try:
         category = db_sess.query(EventCategory).get(category_id)
         if not category:
