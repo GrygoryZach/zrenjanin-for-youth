@@ -85,7 +85,6 @@ def find_events():
         db_sess.close()
 
 
-
 # GET a specific Event by ID
 @events_api_bp.route('/events/<int:event_id>', methods=['GET'])
 def get_event_by_id(event_id):
@@ -234,6 +233,7 @@ def get_basic_event_categories():
         return jsonify({"message": f"Error retrieving basic event categories: {str(e)}"}), 500
     finally:
         db_sess.close()
+
 
 # GET a specific EventCategory by ID
 @events_api_bp.route('/event_categories/<int:category_id>', methods=['GET'])
