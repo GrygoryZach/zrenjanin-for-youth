@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Zanimljiva mesta - Zrenjanin{% endblock %}</title>
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" defer></script>
+
+    {% block head %}{% endblock %}
+</head>
+<body>
+
+<div class="layout-wrapper">
+    <header class="site-header">
+        <div class="container">
+            <a href="{{ url_for('routes.main_page') }}" class="logo">Zrenjanin for youth</a>
+            <nav class="main-nav">
+                <a href="{{ url_for('routes.main_page') }}">Glavna</a>
+                <a href="{{ url_for('routes.place_search') }}">Pretraga</a>
+                <a href="{{ url_for('routes.about') }}">O projektu</a>
+            </nav>
+        </div>
+    </header>
+
+    <main class="site-main container">
+        {% block content %}{% endblock %}
+    </main>
+
+    <footer class="site-footer">
+        <div class="container">
+            <p>&copy; 2025 Zrenjanin Explorer.</p>
+        </div>
+    </footer>
+</div>
+
+{% block scripts %}{% endblock %}
+</body>
+</html>

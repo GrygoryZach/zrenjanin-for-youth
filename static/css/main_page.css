@@ -1,0 +1,120 @@
+/* main_page.css — только специфические стили страницы */
+
+.search-section {
+    margin: 40px auto;
+    max-width: 1000px;
+    padding: 0 20px;
+}
+
+.top-bar {
+    background: white;
+    padding: 1.2rem 1.5rem;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    flex-wrap: wrap;
+}
+
+.top-bar-left {
+    display: flex;
+    flex: 1;
+    gap: 10px;
+    flex-wrap: wrap;
+    align-items: center;
+}
+
+#searchInput {
+    flex: 1;
+    padding: 12px 18px;
+    border: 1px solid #ccc;
+    border-radius: 25px;
+    font-size: 1em;
+    min-width: 200px;
+    outline: none;
+    transition: border-color 0.3s;
+}
+
+#searchInput:focus {
+    border-color: #3498db;
+    box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2);
+}
+
+#search-button {
+    background-color: #27ae60;
+    color: white;
+    padding: 12px 24px;
+    border: none;
+    border-radius: 25px;
+    cursor: pointer;
+    font-size: 1em;
+    font-weight: 600;
+    transition: background-color 0.3s ease, transform 0.1s ease;
+    flex-shrink: 0;
+}
+
+#search-button:hover {
+    background-color: #229a56;
+    transform: translateY(-1px);
+}
+
+.divider {
+    height: 40px;
+    width: 1px;
+    background-color: #ddd;
+}
+
+.toggle-places-events {
+    display: flex;
+    gap: 10px;
+    flex-shrink: 0;
+}
+
+.toggle-places-events button {
+    background-color: #007bff;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 25px;
+    cursor: pointer;
+    font-size: 1em;
+    font-weight: 600;
+    transition: background-color 0.3s ease, transform 0.1s ease;
+}
+
+.toggle-places-events button:hover,
+.toggle-places-events button.active {
+    background-color: #0056b3;
+    transform: translateY(-2px);
+}
+
+@media (max-width: 768px) {
+    .top-bar {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .top-bar input[type="text"] {
+        width: 100%;
+    }
+
+    .toggle-places-events {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .toggle-places-events button {
+        flex: 1 1 auto;
+        min-width: 100px;
+        padding: 10px 12px;
+        font-size: 0.9em;
+    }
+
+    #search-button {
+        width: 100%;
+        padding: 12px;
+        font-size: 1em;
+    }
+}

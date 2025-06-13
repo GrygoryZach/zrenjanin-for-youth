@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+{% block content %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/event_details.css') }}">
+<script defer src="{{ url_for('static', filename='js/event_details.js') }}"></script>
+
+<div class="event-page">
+  <a onclick="history.back()" class="back-btn">Nazad</a>
+  <div class="event-layout">
+    <div class="left">
+      <img id="event-image" src="{{ url_for('static', filename='placeholder.jpg') }}">
+    </div>
+    <div class="right">
+      <h1 id="event-name"><Učitavanje></Učitavanje>...</h1>
+      <p><strong>Kategorija: </strong> <span id="event-category">—</span></p>
+      <p><strong>Datum održavanja: </strong> <span id="event-datetime">—</span></p>
+      <p><strong>Mesto: </strong> <span id="event-place">—</span></p>
+      <p id="event-description">—</p>
+    </div>
+  </div>
+  <div class="map-block">
+    <div id="map" style="height: 400px;"></div>
+  </div>
+</div>
+{% endblock %}

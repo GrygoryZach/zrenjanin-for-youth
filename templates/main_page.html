@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+
+{% block title %}Početna — Zanimljiva mesta{% endblock %}
+
+{% block head %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/main_page.css') }}">
+{% endblock %}
+
+{% block content %}
+<section class="hero">
+    <h1>Dobrodošli</h1>
+    <p>Istražite zanimljiva mesta u gradu Zrenjaninu</p>
+</section>
+
+<section class="search-section">
+    <div class="top-bar">
+        <div class="top-bar-left">
+            <input type="text" id="searchInput" placeholder="Pretraži mesta ili događaje...">
+            <button type="submit" id="search-button">Pretraži</button>
+        </div>
+        <div class="divider"></div>
+        <div class="toggle-places-events">
+            <button data-category="places" class="active">Mesta</button>
+            <button data-category="events">Događaji</button>
+        </div>
+    </div>
+</section>
+
+<section class="highlights">
+    <h2>Popularne kategorije</h2>
+    <div class="grid">
+        <div class="card">
+            <h3>Istorijska mesta</h3>
+            <p>Spomenici, stare zgrade, muzeji i još mnogo toga.</p>
+        </div>
+        <div class="card">
+            <h3>Parkovi i priroda</h3>
+            <p>Najbolja mesta za odmor i šetnju na svežem vazduhu.</p>
+        </div>
+        <div class="card">
+            <h3>Kulturni objekti</h3>
+            <p>Pozorišta, galerije, kulturni centri i događaji.</p>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/main_page.js') }}" defer></script>
+{% endblock %}

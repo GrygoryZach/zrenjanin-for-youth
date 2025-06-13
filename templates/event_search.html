@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+
+{% block title %}Pretraga događaja{% endblock %}
+
+{% block head %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/search.css') }}">
+<script src="{{ url_for('static', filename='js/events.js') }}" defer></script>
+{% endblock %}
+
+{% block content %}
+<div class="top-bar">
+    <input type="text" id="search-input" placeholder="Pretraga po nazivu/opisu događaja...">
+    <div class="button-group">
+        <button id="search-button">Pronađi</button>
+        <button id="toggle-map">Prikaži mapu</button>
+    </div>
+</div>
+
+<div class="main-content">
+    <aside class="filters">
+        <div class="category-filters">
+            <h3>Kategorije</h3>
+        </div>
+        <label for="perPageSelect">Rezultata po stranici:</label>
+        <select id="perPageSelect">
+            <option value="5">5</option>
+            <option value="10" selected>10</option>
+            <option value="20">20</option>
+        </select>
+        <br><br>
+    </aside>
+
+    <div class="content-wrapper">
+        <section class="places-grid-container">
+            <h2>Rezultati pretrage</h2>
+            <p id="loading-message">Učitavanje rezultata...</p>
+            <p id="error-message" class="hidden">Došlo je do greške prilikom učitavanja.</p>
+            <div id="results">
+                <p>Krenite da pretražujete da biste videli rezultate.</p>
+            </div>
+        </section>
+    </div>
+</div>
+
+<div class="pagination" style="text-align:center; margin-top:20px;">
+    <button id="prevPageButton" disabled>Prethodna</button>
+    <button id="nextPageButton" disabled>Sledeća</button>
+</div>
+<div id="currentPageInfo" style="text-align:center; margin-top:8px; font-weight: bold;">
+    Stranica 1 od 1
+</div>
+
+<div id="map-modal" class="map-modal hidden">
+    <div class="map-modal-content">
+        <button class="close-map">&times;</button>
+        <div id="map"></div>
+    </div>
+</div>
+{% endblock %}

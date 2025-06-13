@@ -1,37 +1,38 @@
 from flask import Blueprint, render_template
+from db import db_session
+from models.__all_models import Place
 
-bp = Blueprint('places', __name__)
+bp = Blueprint('routes', __name__)
 
 
 @bp.route('/')
-def index():
-    places = [
-        {
-            "id": 1,
-            "name": "Ultra Caffe",
-            "category": "Zabava",
-            "latitude": 45.3836,
-            "longitude": 20.3883,
-            "image_url": "https://www.tripadvisor.com/LocationPhotoDirectLink-g304108-d8483641-i222539700-UltraCaffe-Zrenjanin_Vojvodina.html",
-            "short_description": "Popularno mesto u centru grada sa muzičkim događajima i opuštenom atmosferom."
-        },
-        {
-            "id": 2,
-            "name": "Caffe Bridge",
-            "category": "Zabava",
-            "latitude": 45.3848,
-            "longitude": 20.3884,
-            "image_url": "https://www.top-rated.online/cities/Zrenjanin/place/p/4598519/Bridge",
-            "short_description": "Kafić sa prelepim pogledom na reku, idealan za opuštanje uz koktel ili kafu."
-        },
-        {
-            "id": 3,
-            "name": "Caffe Papagaj",
-            "category": "Zabava",
-            "latitude": 45.3832,
-            "longitude": 20.3879,
-            "image_url": "https://www.zrklik.com/2022/06/potrebna-devojka-za-rad-u-kaficu-papagaj-odlicni-uslovi/",
-            "short_description": "Tradicija duga 26 godina, poznat po prijatnoj atmosferi i ljubavi prema dobroj kafi."
-        }
-    ]
-    return render_template("index.html", places=places, page=1, has_next=True)
+def main_page():
+    return render_template("main_page.html")
+
+
+@bp.route('/about')
+def about():
+    return render_template("about.html")
+
+
+@bp.route('/place_search')
+def place_search():
+    return render_template("place_search.html")
+
+
+@bp.route('/places/<int:place_id>')
+def place_details(place_id: int):
+    db_sess = db_session.create_session()
+    place = db_sess.query(Place).get(place_id)
+    place_dict = place.to_dict()
+    return render_template("place_details.html", place=place_dict)
+
+
+@bp.route('/events/<int:event_id>')
+def event_details(event_id):
+    return render_template('event_details.html', event_id=event_id)
+
+
+@bp.route('/event_search')
+def event_search():
+    return render_template("event_search.html")

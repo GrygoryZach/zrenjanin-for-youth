@@ -1,0 +1,198 @@
+:root {
+    --color-bg: #f4f4f4;
+    --color-white: #ffffff;
+    --color-dark: #222;
+    --color-light: #666;
+    --color-accent: #007bff;
+    --color-accent-hover: #0056b3;
+    --color-footer-bg: #1e1e1e;
+    --font-main: 'Segoe UI', Tahoma, sans-serif;
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: var(--font-main);
+    font-size: 16px;
+    line-height: 1.6;
+    background-color: var(--color-bg);
+    color: var(--color-dark);
+}
+
+a {
+    color: var(--color-accent);
+    text-decoration: none;
+}
+
+a:hover {
+    color: var(--color-accent-hover);
+}
+
+.container {
+    width: 90%;
+    max-width: 1100px;
+    margin: auto;
+    padding: 1rem 0;
+}
+
+.layout-wrapper {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+.site-header {
+    background-color: var(--color-white);
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+    padding: 1rem 0;
+    margin-bottom: 1.5rem;
+}
+
+.site-header .container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.logo {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: var(--color-accent);
+}
+
+.main-nav a {
+    margin-left: 1rem;
+    font-weight: 500;
+    color: var(--color-dark);
+}
+
+.main-nav a:hover {
+    color: var(--color-accent-hover);
+}
+
+.site-main {
+    flex-grow: 1;
+}
+
+.site-footer {
+    background-color: var(--color-footer-bg);
+    color: #ccc;
+    text-align: center;
+    padding: 1rem 0;
+    font-size: 0.9rem;
+    margin-top: 2rem;
+}
+
+.hero {
+    text-align: center;
+    background-color: var(--color-white);
+    padding: 3rem 1rem;
+    border-radius: 12px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+    margin-bottom: 2rem;
+}
+
+.hero h1 {
+    font-size: 2.5rem;
+    margin-bottom: 1rem;
+}
+
+.hero p {
+    font-size: 1.2rem;
+    margin-bottom: 2rem;
+    color: var(--color-light);
+}
+
+.btn-primary {
+    display: inline-block;
+    padding: 12px 24px;
+    background-color: var(--color-accent);
+    color: white;
+    border-radius: 25px;
+    font-weight: bold;
+    font-size: 1rem;
+    transition: background-color 0.2s ease;
+}
+
+.btn-primary:hover {
+    background-color: var(--color-accent-hover);
+}
+
+.highlights {
+    padding: 2rem 0;
+}
+
+.highlights h2 {
+    text-align: center;
+    margin-bottom: 2rem;
+    font-size: 2rem;
+}
+
+.grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 1.5rem;
+}
+
+.card {
+    background-color: var(--color-white);
+    border-radius: 8px;
+    padding: 1.5rem;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.08);
+}
+
+.card h3 {
+    margin-bottom: 0.5rem;
+    font-size: 1.25rem;
+}
+
+.card p {
+    color: var(--color-light);
+    font-size: 0.95rem;
+}
+
+.search-section {
+    max-width: 600px;
+    margin: 2em auto;
+    text-align: center;
+}
+
+.search-input {
+    width: 80%;
+    padding: 10px;
+    font-size: 16px;
+    margin-bottom: 1em;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+.categories {
+    margin-bottom: 1em;
+    text-align: left;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5em;
+}
+
+.categories label {
+    font-size: 14px;
+}
+
+.btn-primary {
+    padding: 10px 20px;
+    font-size: 16px;
+    background-color: #0077cc;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.btn-primary:hover {
+    background-color: #005fa3;
+}
