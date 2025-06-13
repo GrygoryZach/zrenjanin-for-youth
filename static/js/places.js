@@ -1,6 +1,6 @@
 const searchInput = document.getElementById('search-input');
 let filterCheckboxes = document.querySelectorAll(".filters input[type='checkbox']");
-const placesResultsDiv = document.getElementById("placesResults");
+const placesResultsDiv = document.getElementById("results");
 const loadingMessage = document.getElementById('loading-message');
 const errorMessage = document.getElementById('error-message');
 const searchButton = document.getElementById('search-button');

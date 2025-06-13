@@ -1,15 +1,15 @@
 {% extends "base.html" %}
 
-{% block title %}Pretraga mesta{% endblock %}
+{% block title %}Pretraga događaja{% endblock %}
 
 {% block head %}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/search.css') }}">
-<script src="{{ url_for('static', filename='js/places.js') }}" defer></script>
+<script src="{{ url_for('static', filename='js/events.js') }}" defer></script>
 {% endblock %}
 
 {% block content %}
 <div class="top-bar">
-    <input type="text" id="search-input" placeholder="Pretraga po nazivu/opisu...">
+    <input type="text" id="search-input" placeholder="Pretraga po nazivu/opisu događaja...">
     <div class="button-group">
         <button id="search-button">Pronađi</button>
         <button id="toggle-map">Prikaži mapu</button>
@@ -47,7 +47,7 @@
     <button id="nextPageButton" disabled>Sledeća</button>
 </div>
 <div id="currentPageInfo" style="text-align:center; margin-top:8px; font-weight: bold;">
-    Stranica 1 od 2
+    Stranica 1 od 1
 </div>
 
 <div id="map-modal" class="map-modal hidden">
