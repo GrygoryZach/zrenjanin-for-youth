@@ -1,0 +1,44 @@
+.event-page {
+  max-width: 1000px;
+  margin: 60px auto;
+  padding: 20px;
+  font-family: Roboto, sans-serif;
+}
+.back-btn {
+  display: flex;
+  align-items: center;
+  width: fit-content;
+  background: none;
+  border: none;
+  color: #007bff;
+  font-size: 1em;
+  font-weight: bold;
+  cursor: pointer;
+  text-decoration: none;
+  margin-bottom: 20px;
+}
+.back-btn::before {
+  content: '←';
+  margin-right: 8px;
+}
+.event-layout {
+  background: white;
+  border-radius: 10px;
+  box-shadow: 0 6px 20px rgba(0,0,0,0.1);
+  padding: 30px;
+  display: flex;
+  gap: 30px;
+}
+.left img {
+  width: 100%;
+  max-width: 400px;
+  border-radius: 8px;
+}
+.right {
+  flex: 1;
+}
+.map-block {
+  margin-top: 50px;
+  border-radius: 10px;
+  overflow: hidden;
+}

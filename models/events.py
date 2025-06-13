@@ -10,6 +10,7 @@ class Event(SqlAlchemyBase):
     name = Column(String, nullable=False)
     description = Column(Text)
     datetime = Column(DateTime)
+    image_url = Column(String)
     place_id = Column(Integer, ForeignKey('places.id'), nullable=False)
     category_id = Column(Integer, ForeignKey('event_categories.id'), nullable=False)
 
@@ -22,6 +23,7 @@ class Event(SqlAlchemyBase):
             'name': self.name,
             'description': self.description,
             'datetime': self.datetime,
+            'image_url': self.image_url,
             'place_id': self.place_id,
             'category': {
                 'category_id': self.category_id,
@@ -29,4 +31,3 @@ class Event(SqlAlchemyBase):
                 'category_parent_id': self.category.parent_id
             }
         }
-
